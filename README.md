@@ -1,6 +1,6 @@
 # authio-go
 
-Authio Go server SDK. Mirrors the [Authio OpenAPI](https://github.com/tcast/authio_proto) surface for backends written in Go.
+Authio Go server SDK. Mirrors the [Authio OpenAPI](https://github.com/authio-com/authio_proto) surface for backends written in Go.
 
 ## Install
 
