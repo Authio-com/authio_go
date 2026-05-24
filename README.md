@@ -7,6 +7,10 @@
 
 # authio-go
 
+> Part of **[Authio Lobby](https://authio.com/products/lobby)** —
+> Authio's drop-in passwordless authentication. Learn more at
+> https://authio.com/products/lobby.
+
 Authio Go server SDK. Mirrors the [Authio OpenAPI](https://github.com/authio-com/authio_proto) surface for backends written in Go.
 
 ## What's new — 2026-05-23 WorkOS-parity sprint
