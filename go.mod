@@ -1,6 +1,6 @@
 module github.com/tcast/authio_go
 
-go 1.25.12
+go 1.25.14
 
 require (
 	github.com/aws/aws-sdk-go-v2 v1.41.7
