@@ -40,7 +40,7 @@ func New(apiKey string, opts ...Option) (*Client, error) {
 
 type Option func(*Client)
 
-func WithBaseURL(u string) Option       { return func(c *Client) { c.BaseURL = strings.TrimRight(u, "/") } }
+func WithBaseURL(u string) Option          { return func(c *Client) { c.BaseURL = strings.TrimRight(u, "/") } }
 func WithHTTPClient(h *http.Client) Option { return func(c *Client) { c.HTTP = h } }
 
 // User mirrors the Authio User entity.
