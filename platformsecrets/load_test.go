@@ -4,12 +4,12 @@ import "testing"
 
 func TestParseIDs(t *testing.T) {
 	cases := map[string][]string{
-		"":                    nil,
-		"  ":                  nil,
-		"a":                   {"a"},
-		"a,b":                 {"a", "b"},
-		" a , b , c ":         {"a", "b", "c"},
-		"a,,b, ,c":            {"a", "b", "c"},
+		"":            nil,
+		"  ":          nil,
+		"a":           {"a"},
+		"a,b":         {"a", "b"},
+		" a , b , c ": {"a", "b", "c"},
+		"a,,b, ,c":    {"a", "b", "c"},
 	}
 	for raw, want := range cases {
 		got := parseIDs(raw)
