@@ -9,7 +9,7 @@ permissions:
   contents: read
 
 # Go modules don't need a registry — `go install
-# github.com/tcast/authio_go@vX.Y.Z` works as soon as the tag exists. This
+# github.com/Authio-com/authio_go@vX.Y.Z` works as soon as the tag exists. This
 # workflow runs the test suite on the tagged commit and then opens a
 # GitHub Release with auto-generated notes so the public version history
 # is reviewable.
