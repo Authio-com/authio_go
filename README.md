@@ -40,13 +40,15 @@ the OpenAPI shape.
 ## Install
 
 ```bash
-go get github.com/tcast/authio_go
+go get github.com/Authio-com/authio_go
 ```
+
+Versions before v0.3.0 declared the module path `github.com/tcast/authio_go`. To upgrade, change your imports to `github.com/Authio-com/authio_go`.
 
 ## Quick start
 
 ```go
-import authio "github.com/tcast/authio_go"
+import authio "github.com/Authio-com/authio_go"
 
 client, _ := authio.New(os.Getenv("AUTHIO_SECRET_KEY"))
 mems, err := client.ListMemberships(ctx, "user_01HX...")
