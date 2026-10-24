@@ -1,6 +1,6 @@
 module github.com/Authio-com/authio_go
 
-go 1.25.14
+go 1.26.10
 
 require (
 	github.com/aws/aws-sdk-go-v2 v1.41.7
