@@ -21,7 +21,15 @@ import (
 // Bootstrap loads each secret ID listed in AUTHIO_AWS_SECRET_IDS. Values
 // must be JSON objects mapping env var names to strings. Existing env vars
 // are never overwritten so local dev overrides keep working.
+//
+// Outside production it also refuses to start when the configuration or
+// the loaded secrets reference production resources or credentials; see
+// envguard.go.
 func Bootstrap(ctx context.Context) error {
+	if err := guardEnvironment("config", processEnv()); err != nil {
+		return err
+	}
+
 	ids := parseIDs(os.Getenv("AUTHIO_AWS_SECRET_IDS"))
 	if len(ids) == 0 {
 		return nil
@@ -44,20 +52,18 @@ func Bootstrap(ctx context.Context) error {
 	}
 	sm := secretsmanager.NewFromConfig(cfg)
 
-	var loaded int
+	loaded := map[string]string{}
 	for _, id := range ids {
-		n, err := mergeSecret(loadCtx, sm, id)
-		if err != nil {
+		if err := mergeSecret(loadCtx, sm, id, loaded); err != nil {
 			return err
 		}
-		loaded += n
 	}
 
 	slog.Info("platformsecrets.bootstrap_ok",
 		"secret_count", len(ids),
-		"env_keys_loaded", loaded,
+		"env_keys_loaded", len(loaded),
 	)
-	return nil
+	return guardEnvironment("secrets", loaded)
 }
 
 func parseIDs(raw string) []string {
@@ -76,23 +82,24 @@ func parseIDs(raw string) []string {
 	return out
 }
 
-func mergeSecret(ctx context.Context, sm *secretsmanager.Client, id string) (int, error) {
+// mergeSecret sets each key of secret id that is not already in the
+// environment and records it in loaded.
+func mergeSecret(ctx context.Context, sm *secretsmanager.Client, id string, loaded map[string]string) error {
 	out, err := sm.GetSecretValue(ctx, &secretsmanager.GetSecretValueInput{
 		SecretId: aws.String(id),
 	})
 	if err != nil {
-		return 0, fmt.Errorf("platformsecrets get %q: %w", id, err)
+		return fmt.Errorf("platformsecrets get %q: %w", id, err)
 	}
 	if out.SecretString == nil || strings.TrimSpace(*out.SecretString) == "" {
-		return 0, fmt.Errorf("platformsecrets get %q: empty secret", id)
+		return fmt.Errorf("platformsecrets get %q: empty secret", id)
 	}
 
 	var kv map[string]string
 	if err := json.Unmarshal([]byte(*out.SecretString), &kv); err != nil {
-		return 0, fmt.Errorf("platformsecrets decode %q: %w", id, err)
+		return fmt.Errorf("platformsecrets decode %q: %w", id, err)
 	}
 
-	n := 0
 	for k, v := range kv {
 		if k == "" || v == "" {
 			continue
@@ -101,9 +108,9 @@ func mergeSecret(ctx context.Context, sm *secretsmanager.Client, id string) (int
 			continue
 		}
 		if err := os.Setenv(k, v); err != nil {
-			return n, fmt.Errorf("platformsecrets setenv %q: %w", k, err)
+			return fmt.Errorf("platformsecrets setenv %q: %w", k, err)
 		}
-		n++
+		loaded[k] = v
 	}
-	return n, nil
+	return nil
 }
