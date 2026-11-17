@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"strings"
 )
 
@@ -97,7 +98,7 @@ type Session struct {
 
 func (c *Client) GetUser(ctx context.Context, id string) (*User, error) {
 	var u User
-	if err := c.do(ctx, http.MethodGet, "/v1/users/"+id, nil, &u); err != nil {
+	if err := c.do(ctx, http.MethodGet, "/v1/users/"+url.PathEscape(id), nil, &u); err != nil {
 		return nil, err
 	}
 	return &u, nil
@@ -105,7 +106,7 @@ func (c *Client) GetUser(ctx context.Context, id string) (*User, error) {
 
 func (c *Client) ListMemberships(ctx context.Context, userID string) ([]Membership, error) {
 	var ms []Membership
-	if err := c.do(ctx, http.MethodGet, "/v1/users/"+userID+"/memberships", nil, &ms); err != nil {
+	if err := c.do(ctx, http.MethodGet, "/v1/users/"+url.PathEscape(userID)+"/memberships", nil, &ms); err != nil {
 		return nil, err
 	}
 	return ms, nil
@@ -148,14 +149,14 @@ type AddMembershipInput struct {
 
 func (c *Client) AddMember(ctx context.Context, orgID string, in AddMembershipInput) (*Membership, error) {
 	var m Membership
-	if err := c.do(ctx, http.MethodPost, "/v1/organizations/"+orgID+"/memberships", in, &m); err != nil {
+	if err := c.do(ctx, http.MethodPost, "/v1/organizations/"+url.PathEscape(orgID)+"/memberships", in, &m); err != nil {
 		return nil, err
 	}
 	return &m, nil
 }
 
 func (c *Client) RemoveMember(ctx context.Context, orgID, membershipID string) error {
-	return c.do(ctx, http.MethodDelete, "/v1/organizations/"+orgID+"/memberships/"+membershipID, nil, nil)
+	return c.do(ctx, http.MethodDelete, "/v1/organizations/"+url.PathEscape(orgID)+"/memberships/"+url.PathEscape(membershipID), nil, nil)
 }
 
 // =====================================================================
